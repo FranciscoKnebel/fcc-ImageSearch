@@ -1,0 +1,26 @@
+{
+  "name": "fcc-imagesearch",
+  "version": "1.0.0",
+  "description": "Image Search Abstraction Layer for freecodecamp",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KyoZeus/fcc-ImageSearch.git"
+  },
+  "keywords": [
+    "freecodecamp"
+  ],
+  "author": "KyoZeus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KyoZeus/fcc-ImageSearch/issues"
+  },
+  "homepage": "https://github.com/KyoZeus/fcc-ImageSearch#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "mongoose": "^4.4.6"
+  }
+}

@@ -1,0 +1,9 @@
+html, body {
+    word-break: break-all;
+    background-color: #9F97A8;
+}
+
+.container {
+    min-height: 100vh;
+    background-color: #C7BDD2;
+}
