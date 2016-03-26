@@ -9,7 +9,7 @@
 <li>I can get a list of the most recently submitted search strings.
 </ul>
 
-###### Example creation usage:
+###### Example usage:
 ```
 
 ```

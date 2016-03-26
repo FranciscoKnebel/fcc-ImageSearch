@@ -1,15 +1,19 @@
 var express = require("express");
 var mongoose = require("mongoose");
 var dotenv = require("dotenv").load();
-var routes = require("./app/routes/index.js");
-var api = require("./app/api.js");
+/*    file .env must contain:
+      MLAB_URL
+      GOOGLE_API
+      CSE_ID
+*/
+var routes = require("./app/routes/index");
+var api = require("./app/api");
 
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 80;
 mongoose.connect(process.env.MLAB_URL);
-
 var db = mongoose.connection;
-var app = express();
 
+var app = express();
 
 app.use('/css', express.static(__dirname + '/client/css'));
 
