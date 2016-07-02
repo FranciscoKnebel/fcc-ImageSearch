@@ -29,7 +29,7 @@ module.exports = function(app, db, dirname) {
                 
             var arr = [];
             for (var i = 0; i < docs.length && i < DEFAULT_LATEST; i++) {
-                arr.push(docs[i]);
+                arr.push({query: docs[i].query, date: docs[i].date});
             }
             
             res.contentType('application/json');
@@ -70,7 +70,7 @@ function searchAndSendBingImages(res, query, count, offset) {
 function addQueryToRecentsList(query) {
     //Add query with current time to db
     var currentDate = new Date();
-    var newQuery = new latest({query: query, date: currentDate});
+    var newQuery = new latest({query: query, date: currentDate.toUTCString()});
     
     newQuery.save(function(err, doc) {
         if(err)
