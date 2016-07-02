@@ -9,7 +9,7 @@ var routes = require("./app/routes/index");
 var api = require("./app/api");
 
 var port = process.env.PORT || 80;
-mongoose.connect(process.env.MLAB_URL);
+mongoose.connect(process.env.MLAB);
 var db = mongoose.connection;
 
 var app = express();

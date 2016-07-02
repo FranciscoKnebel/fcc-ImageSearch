@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var latest = Schema({
     query: String,
-    date: String
+    date: Date
 });
 
 module.exports = mongoose.model('latest', latest);

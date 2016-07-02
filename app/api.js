@@ -6,6 +6,7 @@ var latest  = require("./models/latest");
 
 const DEFAULT_OFFSET = 0;
 const DEFAULT_COUNT  = 10;
+const DEFAULT_LATEST = 10;
 
 module.exports = function(app, db, dirname) {
     
@@ -17,6 +18,23 @@ module.exports = function(app, db, dirname) {
         
         searchAndSendBingImages(res, req.params.query, count, offset);
         
+    });
+    
+    app.get('/latest', function(req, res) {
+        //Get latest queries from DB, from latest to newest.
+        
+        latest.find({}).sort({ date: -1 }).exec( function(err, docs) {
+            if(err)
+                console.error(err);
+                
+            var arr = [];
+            for (var i = 0; i < docs.length && i < DEFAULT_LATEST; i++) {
+                arr.push(docs[i]);
+            }
+            
+            res.contentType('application/json');
+            res.send(arr);
+        });
     });
     
     db.on  ('error', console.error.bind(console, 'connection error:'));
@@ -52,7 +70,7 @@ function searchAndSendBingImages(res, query, count, offset) {
 function addQueryToRecentsList(query) {
     //Add query with current time to db
     var currentDate = new Date();
-    var newQuery = new latest({query: query, date: currentDate.toUTCString()});
+    var newQuery = new latest({query: query, date: currentDate});
     
     newQuery.save(function(err, doc) {
         if(err)

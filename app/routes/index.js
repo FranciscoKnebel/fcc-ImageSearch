@@ -11,11 +11,6 @@ module.exports = function(app, dirname) {
         res.sendFile(dirname + '/LICENSE.md');
     });
 
-    app.get('/latest', function(req, res) {
-        //Get latest query terms from DB.
-        res.send("Latest.");
-    })
-
     app.get('/search', function(req, res) {
         res.sendFile(dirname + '/client/views/index.html');
     });
