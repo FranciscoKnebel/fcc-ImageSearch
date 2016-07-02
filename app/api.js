@@ -1,75 +1,82 @@
 var dotenv  = require("dotenv");
 var request = require("request");
 var time    = require("time")(Date);
+var isNumeric = require("is-number");
 var latest  = require("./models/latest");
+
+const DEFAULT_OFFSET = 0;
+const DEFAULT_COUNT  = 10;
 
 module.exports = function(app, db, dirname) {
     
     app.get('/search/:query', function(req, res) {
-        var url = 'https://www.googleapis.com/customsearch/v1?key=' + process.env.GOOGLE_API + '&cx=' + process.env.CSE_ID;
-        var query = '&q=' + req.params.query;
-        var searchType = '&searchType=image&alt=json';
-        
-        //Add query with current time to db
-        var currentDate = new Date();
-        var newQuery = new latest({query: req.params.query, date: currentDate.toUTCString()});
-        newQuery.save(function(err) {
-            if(err)
-                console.error(err);
-            
-            console.log(newQuery);
-        });
-        
-        
-        //Bing Search
-        var urlBing = "https://api.cognitive.microsoft.com/bing/v5.0/images/search?q=" + req.params.query + "&count=10" + "&offset=10";
-        const options = {
-            url: urlBing,
-            headers: {
-                "Ocp-Apim-Subscription-Key": process.env.BING_API
-            }
-        }
-        
-        request(options, function(error, response, body) {
-            if(!error && response.statusCode == 200) {
-                var obj = JSON.parse(body);
-                var arr = [];
-                
-                for (var i = 0; i < obj.value.length; i++)
-                    arr.push(queryItemBing(obj.value[i]));
+        var count  = parameterValue(req.query.count, DEFAULT_COUNT);
+        var offset = parameterValue(req.query.offset, DEFAULT_OFFSET);
 
-                res.contentType('application/json');
-                res.send(arr);
-            }
-            else {
-                res.send("Failed searching with Bing.");
-            }
-        });
+        addQueryToRecentsList(req.params.query);
+        
+        searchAndSendBingImages(res, req.params.query, count, offset);
+        
     });
     
-    
     db.on  ('error', console.error.bind(console, 'connection error:'));
-    
-    db.once('open' , function() {});
 };
 
+function searchAndSendBingImages(res, query, count, offset) {
+    //Bing Search
+    var url = "https://api.cognitive.microsoft.com/bing/v5.0/images/search?q=" + query + "&count=" + count + "&offset=" + offset;
+    const options = {
+        url: url,
+        headers: {
+            "Ocp-Apim-Subscription-Key": process.env.BING_API
+        }
+    };
+    
+    request(options, function(error, response, body) {
+        if(!error && response.statusCode == 200) {
+            var obj = JSON.parse(body);
+            var arr = [];
+            
+            for (var i = 0; i < obj.value.length; i++)
+                arr.push(queryItem(obj.value[i]));
+
+            res.contentType('application/json');
+            res.send(arr);
+        }
+        else {
+            res.send("Failed searching with Bing.");
+        }
+    });
+}
+
+function addQueryToRecentsList(query) {
+    //Add query with current time to db
+    var currentDate = new Date();
+    var newQuery = new latest({query: query, date: currentDate.toUTCString()});
+    
+    newQuery.save(function(err, doc) {
+        if(err)
+            console.error(err);
+    });
+}
 
 function queryItem(element) {
     var obj = {
-        url: element.link,
-        title: element.title,
-        thumbnail: element.image.thumbnailLink
-    }
-
-    return obj;
-}
-
-function queryItemBing(element) {
-    var obj = {
-        url: element.contentUrl,
+        image: element.contentUrl,
         title: element.name,
-        thumbnail: element.thumbnailUrl
+        thumbnail: element.thumbnailUrl,
+        host: element.hostPageDisplayUrl,
+        width: element.width,
+        height: element.height
     }
     
     return obj;
+}
+
+function parameterValue(parameter, defaultValue) {
+    var value = defaultValue;
+    if(isNumeric(parameter))
+        value = parameter;
+    
+    return value;
 }

@@ -3,8 +3,7 @@ var mongoose = require("mongoose");
 var dotenv = require("dotenv").load();
 /*    file .env must contain:
       MLAB_URL
-      GOOGLE_API
-      CSE_ID
+      BING_API
 */
 var routes = require("./app/routes/index");
 var api = require("./app/api");
