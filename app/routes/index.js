@@ -1,6 +1,3 @@
-var dotenv = require("dotenv");
-var request = require("request");
-
 module.exports = function(app, dirname) {
 
     app.get('/', function(req, res) {
@@ -12,7 +9,10 @@ module.exports = function(app, dirname) {
     });
 
     app.get('/search', function(req, res) {
-        res.sendFile(dirname + '/client/views/index.html');
+        res.redirect('/latest');
     });
-
+    
+    app.get('/*', function(req, res) {
+        res.sendFile(dirname + '/client/views/404.html');
+    });
 };
